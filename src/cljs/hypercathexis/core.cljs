@@ -1,12 +1,53 @@
 (ns hypercathexis.core
   (:require [om.core :as om :include-macros true]
-            [om-tools.dom :as dom :include-macros true]))
+            [om-tools.dom :as dom :include-macros true]
+            [clojure.string :refer [join]]))
 
 (defonce app-state (atom {}))
 
-(def width 97)
-(def aspect (/ (Math.sqrt 3) 2))
-(def height (* width aspect))
+(def regular-aspect (/ (Math.sqrt 3) 2))
+
+(def ^:private base-hex-coords
+  "Base hex coordinates, relative to a width and height of 1."
+  [[-0.50 +0.25]
+   [+0.00 +0.50]
+   [+0.50 +0.25]
+   [+0.50 -0.25]
+   [+0.00 -0.50]
+   [-0.50 -0.25]])
+
+(def base-vecs
+  "Axial base vectors."
+  [[1 0]
+   [.5 .75]])
+
+(defn scale-vec
+  "Scales a vector by a scalar."
+  [x v]
+  (map (partial * x) v))
+
+(defn add-vecs
+  "Adds vectors elementwise."
+  [& vs]
+  (apply (partial map +) vs))
+
+(defn translate
+  "Translation vectors for given axial coordinates."
+  [v]
+  (apply add-vecs (map scale-vec v base-vecs)))
+
+(defn translation->svg
+  [[dx dy]]
+  (str "translate(" dx "," dy ")"))
+
+(defn scale->svg
+  [& xs]
+  (str "scale(" (join "," xs) ")"))
+
+(defn coords->svg
+  [coords]
+  (let [coord-strs (map (partial join ",") coords)]
+    (join " " coord-strs)))
 
 (defn axial->cube
   [[q r]]
@@ -30,21 +71,20 @@
 
 (defn main []
   (om/root
-    (fn [app owner]
-      (reify
-        om/IRender
-        (render [_]
-          (dom/div
-           (for [c (range 10)]
-             (for [r (range 30)]
-               (dom/img {:src "img/hex.svg"
-                         :style {:display "block"
-                                 :position "absolute"
-                                 :width width
-                                 :height height
-                                 :left (+ (* c 1.5 width)
-                                          (* (mod r 2)
-                                             (* 0.75 width)))
-                                 :top (* 0.5 r height)}})))))))
-    app-state
-    {:target (. js/document (getElementById "app"))}))
+   (fn [app owner]
+     (reify
+       om/IRender
+       (render [_]
+         (dom/svg
+          {:width 1000
+           :height 1000
+           :transform (apply scale->svg (scale-vec 100 [regular-aspect 1]))}
+          (for [q (range 4)
+                r (range 5)]
+            (dom/polygon {:fill "black"
+                          :stroke "white"
+                          :stroke-width 0.05
+                          :transform (translation->svg (translate [q r]))
+                          :points (coords->svg base-hex-coords)}))))))
+   app-state
+   {:target (. js/document (getElementById "app"))}))
