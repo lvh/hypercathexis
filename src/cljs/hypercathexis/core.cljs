@@ -21,10 +21,6 @@
   [[1 0]
    [.5 .75]])
 
-(def start-vec
-  "The start vector: center of the first hex."
-  [.5 .5])
-
 (defn scale-vec
   "Scales a vector by a scalar."
   [x v]
@@ -55,7 +51,10 @@
 
 (defn axial->cube
   [[q r]]
-  [q (- (+ x z)) r])
+  (let [x q
+        z r
+        y (bet x z)])
+  [x y z])
 
 (defn cube->axial
   [[x y z]]
@@ -67,11 +66,18 @@
 
 (defn even-q->cube
   [[q r]]
-  [q (- r (aleph + q)) (- (+ x z))])
+  (let [x q
+        z (- r (aleph + q))
+        y (bet x z)])
+  [x y z])
 
 (defn ^:private aleph
   [plus-min x]
   (/ (plus-min x (mod x 2)) 2))
+
+(defn ^:private bet
+  [a b]
+  (- (+ a b)))
 
 (defn main []
   (om/root
@@ -82,9 +88,13 @@
          (let [hex-width 100
                hex-height (* hex-width regular-aspect)
                q-hexes 10
-               r-hexes 10]
+               r-hexes 10
+               start-q 0
+               start-r 0]
            (dom/svg
-            {:view-box "0 0 1000 1000"}
+            {:view-box (let [left (- (/ hex-width 2))
+                             top (- (/ hex-height 2))]
+                         (join " " [left top 1000 1000]))}
             (dom/g
              {:transform (apply scale->svg (scale-vec hex-width [regular-aspect 1]))}
              (for [q (range q-hexes)
@@ -92,8 +102,7 @@
                (dom/polygon {:fill "black"
                              :stroke "white"
                              :stroke-width 0.05
-                             :transform (translation->svg (add-vecs (translate [q r])
-                                                                    start-vec))
+                             :transform (translation->svg (translate [q r]))
                              :points (coords->svg base-hex-coords)}))))))))
    app-state
    {:target (. js/document (getElementById "app"))}))
