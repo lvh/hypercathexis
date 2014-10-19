@@ -100,7 +100,7 @@
                    r (range r-hexes)]
                (dom/polygon {:fill "black"
                              :stroke "white"
-                             :stroke-width 0.05
+                             :stroke-width (/ 1 scale)
                              :transform (translation->svg (translate [q r]))
                              :points (coords->svg base-hex-coords)}))))))))
    app-state
