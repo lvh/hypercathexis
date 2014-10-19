@@ -79,17 +79,21 @@
      (reify
        om/IRender
        (render [_]
-         (dom/svg
-          {:width 1000
-           :height 1000
-           :transform (apply scale->svg (scale-vec 100 [regular-aspect 1]))}
-          (for [q (range 10)
-                r (range 7)]
-            (dom/polygon {:fill "black"
-                          :stroke "white"
-                          :stroke-width 0.05
-                          :transform (translation->svg (add-vecs (translate [q r])
-                                                                 start-vec))
-                          :points (coords->svg base-hex-coords)}))))))
+         (let [hex-width 100
+               hex-height (* hex-width regular-aspect)
+               q-hexes 10
+               r-hexes 10]
+           (dom/svg
+            {:view-box "0 0 1000 1000"}
+            (dom/g
+             {:transform (apply scale->svg (scale-vec hex-width [regular-aspect 1]))}
+             (for [q (range q-hexes)
+                   r (range r-hexes)]
+               (dom/polygon {:fill "black"
+                             :stroke "white"
+                             :stroke-width 0.05
+                             :transform (translation->svg (add-vecs (translate [q r])
+                                                                    start-vec))
+                             :points (coords->svg base-hex-coords)}))))))))
    app-state
    {:target (. js/document (getElementById "app"))}))
