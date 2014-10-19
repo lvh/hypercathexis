@@ -21,6 +21,10 @@
   [[1 0]
    [.5 .75]])
 
+(def start-vec
+  "The start vector: center of the first hex."
+  [.5 .5])
+
 (defn scale-vec
   "Scales a vector by a scalar."
   [x v]
@@ -84,7 +88,8 @@
             (dom/polygon {:fill "black"
                           :stroke "white"
                           :stroke-width 0.05
-                          :transform (translation->svg (translate [q r]))
+                          :transform (translation->svg (add-vecs (translate [q r])
+                                                                 start-vec))
                           :points (coords->svg base-hex-coords)}))))))
    app-state
    {:target (. js/document (getElementById "app"))}))
