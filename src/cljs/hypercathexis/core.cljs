@@ -85,18 +85,17 @@
      (reify
        om/IRender
        (render [_]
-         (let [hex-width 100
-               hex-height (* hex-width regular-aspect)
+         (let [scale 100
+               hex-height (* scale regular-aspect)
                q-hexes 10
                r-hexes 10
                start-q 0
                start-r 0]
            (dom/svg
-            {:view-box (let [left (- (/ hex-width 2))
-                             top (- (/ hex-height 2))]
-                         (join " " [left top 1000 1000]))}
+            {:view-box (let [offset (- (/ scale 2))]
+                         (join " " [offset offset 1000 1000]))}
             (dom/g
-             {:transform (apply scale->svg (scale-vec hex-width [regular-aspect 1]))}
+             {:transform (apply scale->svg (scale-vec scale [regular-aspect 1]))}
              (for [q (range q-hexes)
                    r (range r-hexes)]
                (dom/polygon {:fill "black"
