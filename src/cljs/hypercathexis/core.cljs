@@ -99,7 +99,7 @@
              (for [q (range q-hexes)
                    r (range r-hexes)]
                (dom/polygon {:fill "black"
-                             :stroke "white"
+                             :stroke "grey"
                              :stroke-width (/ 1 scale)
                              :transform (translation->svg (translate [q r]))
                              :points (coords->svg base-hex-coords)}))))))))
