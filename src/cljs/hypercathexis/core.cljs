@@ -79,8 +79,8 @@
           {:width 1000
            :height 1000
            :transform (apply scale->svg (scale-vec 100 [regular-aspect 1]))}
-          (for [q (range 4)
-                r (range 5)]
+          (for [q (range 10)
+                r (range 7)]
             (dom/polygon {:fill "black"
                           :stroke "white"
                           :stroke-width 0.05
